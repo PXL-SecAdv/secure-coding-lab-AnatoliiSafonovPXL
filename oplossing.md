@@ -1,7 +1,8 @@
 ## RISK #2: Insecure Storage
-To securely store sensetive information we're gonna hash it. To do it, we're going to implement `bcrypt` algorithm in backend logic.
-First, we need to install bcrypt in our project: `npm install bcrypt`, then include it in required modules: `const bcrypt = require('bcrypt')`.
-Then we just paste the whole auth block to ChatGPT with prompt "re-write this piece of code to make use of bcrypt hashing algorithm. dont change any app logic", and the output is:
+Om gevoelige informatie veilig op te slaan, gaan we deze hashen. Hiervoor gaan we het `bcrypt`-algoritme implementeren in de backendlogica. Eerst moeten we bcrypt installeren in ons project: npm install bcrypt. Vervolgens voegen we het toe aan de vereiste modules: `const bcrypt = require('bcrypt')`. Daarna plakken we het hele authenticatieblok in ChatGPT met de prompt:
+"__re-write this piece of code to make use of bcrypt hashing algorithm. dont change any app logic__"
+
+De output is dan:
 ```js
 app.get('/authenticate/:username/:password', async (request, response) => {
   const username = request.params.username;
@@ -31,7 +32,8 @@ app.get('/authenticate/:username/:password', async (request, response) => {
 });
 ```
 
-But we still have an issue of existing users: their sensetive data is still being stored in plain text. So another ChatGPT prompt, now "Add a check to see if password is encrypted. If it was stored in plain text, update it with hashed version".
+Maar we hebben nog steeds een probleem met bestaande gebruikers: hun gevoelige gegevens worden nog steeds in platte tekst opgeslagen. Dus gebruiken we een nieuwe ChatGPT-prompt:
+"__Add a check to see if password is encrypted. If it was stored in plain text, update it with hashed version__".
 ```js
 app.get('/authenticate/:username/:password', async (request, response) => {
     const { username, password } = request.params;
@@ -79,7 +81,7 @@ app.get('/authenticate/:username/:password', async (request, response) => {
 });
 ```
 
-And after logging in with pre-existing username, we can see that his password was updated:
+En nadat we ingelogd zijn met een bestaande gebruikersnaam, kunnen we zien dat zijn wachtwoord werd bijgewerkt:
 ```
  id | user_name |                           password                           
 ----+-----------+--------------------------------------------------------------
@@ -89,6 +91,8 @@ And after logging in with pre-existing username, we can see that his password wa
 ```
 
 ## RISK #4 Credentials in Version Control
-One of the options: create a local `.env` file, in which we store our sensetive credentials. To not expose them in Version Control system, we're adding this file into .gitignore, to tell GitHub to ignore it. This option, however, is not the best for big projects. Instead it is recommended to use some kind of Secrets Vault (for example HashiCorp Vault, 1Password Secrets, native secret manager on AWS etc).
-To deal with already exposed credentials, it is required to rotate all of the compromised credentials. In same cases it might be also useful to clear github history using tools like `BFG Repo-Cleaner`.
+Een van de opties is het aanmaken van een lokale .env-bestand, waarin we onze gevoelige inloggegevens opslaan. Om te voorkomen dat deze gegevens zichtbaar zijn in het versiebeheersysteem, voegen we dit bestand toe aan `.gitignore`, zodat GitHub het negeert.
 
+Deze aanpak is echter niet ideaal voor grotere projecten. In plaats daarvan wordt aangeraden om gebruik te maken van een gespecialiseerde __Secrets Vault__, zoals **HashiCorp Vault**, **1Password Secrets** of de **native secret manager op AWS**.
+
+Als er reeds gevoelige gegevens zijn blootgesteld, moeten alle gecompromitteerde inloggegevens geroteerd worden. In sommige gevallen kan het ook nuttig zijn om de GitHub-geschiedenis te wissen, bijvoorbeeld met behulp van tools zoals `BFG Repo-Cleaner`.
